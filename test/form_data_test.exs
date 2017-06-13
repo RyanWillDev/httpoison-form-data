@@ -119,12 +119,12 @@ defmodule FormDataTest do
     end
 
     {:ok, multipart} = %{
-      one: %FormData.File{path: "test/fixtures/test1.txt"},
+      one: FormData.File.new("test/fixtures/test1.txt"),
       two: %{
-        three: %FormData.File{path: "test/fixtures/test2.txt"},
+        three: FormData.File.new("test/fixtures/test2.txt"),
         four: [
-          %FormData.File{path: "test/fixtures/test3.txt"},
-          %FormData.File{path: "test/fixtures/test4.txt"}
+          FormData.File.new("test/fixtures/test3.txt"),
+          FormData.File.new("test/fixtures/test4.txt")
         ]
       }
     } |> FormData.create(:multipart)

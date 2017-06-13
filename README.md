@@ -22,7 +22,7 @@ end
 
 def deps do
   [{:httpoison_form_data, "~> 0.1"},
-   {:httpoison, "~> 0.9.0"}]
+   {:httpoison, "~> 0.11.2"}]
 end
 ```
 
@@ -46,7 +46,7 @@ some_structure = %{
       }
     }
   ],
-  fifth_key: %FormData.File.new("path/to/file.txt")
+  fifth_key: FormData.File.new("path/to/file.txt")
 }
 ```
 #### Example 1
