@@ -46,7 +46,7 @@ some_structure = %{
       }
     }
   ],
-  fifth_key: %FormData.File{path: "path/to/file.txt"}
+  fifth_key: %FormData.File.new("path/to/file.txt")
 }
 ```
 #### Example 1

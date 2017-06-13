@@ -1,6 +1,17 @@
 defmodule FormData.Formatters.URLEncoded do
   @behaviour FormData.Formatters
 
+  @type options     :: [] | [get: true] | [url: true]
+
+  @type key         :: String.t
+  @type value       :: String.t
+  @type entry       :: {key, value}
+  @type post        :: {:form, list(entry)}
+  @type get         :: [params: list(entry)]
+  @type url         :: String.t
+
+  @type t           :: post | get | url
+
   @doc """
   Format a `stream` of key-value tuples for URL Encoded requests.
 
@@ -24,6 +35,7 @@ defmodule FormData.Formatters.URLEncoded do
       "?Name=Value&Name2=Value2"
 
   """
+  @spec output(stream :: Stream.t, opts :: options) :: __MODULE__.t
   def output([], [url: true]), do: ""
   def output([], [get: true]), do: [params: []]
   def output([], _opts), do: {:form, []}

@@ -4,6 +4,9 @@ defmodule FormData do
   formatted names for both multipart and urlencoded requests.
   """
 
+  @type input_type :: keyword | map | struct
+  @type payload :: FormData.Formatters.Multipart.t | FormData.Formatters.URLEncoded.t
+
   defmodule Error do
     @moduledoc """
     This is the generic FormData error. It should only be triggered when the
@@ -18,7 +21,19 @@ defmodule FormData do
   end
 
   defmodule File do
+    @type t :: %__MODULE__{path: String.t}
+
     defstruct path: ""
+
+    @doc """
+    Create a new File struct containing the path specified
+
+    Addition based on suprafly's (https://github.com/suprafly) fork for northofsummer.
+    """
+    @spec new(path :: String.t) :: File.t
+    def new(path) do
+      %__MODULE__{path: path}
+    end
   end
 
   @formatters %{
@@ -33,7 +48,7 @@ defmodule FormData do
   The built-in formatters are Multipart and URLEncoded, but a 3rd-party
   formatter that is a behaviour of FormData.Formatter can be passed in as well.
   """
-  @spec create(obj :: keyword | map | struct, formatter :: atom, output_opts :: keyword(boolean)) :: {:ok, any} | {:error, String.t}
+  @spec create(obj :: input_type, formatter :: module, output_opts :: keyword(boolean)) :: {:ok, payload} | {:error, String.t}
   def create(obj, formatter, output_opts \\ [])
   def create(obj, formatter, output_opts) when is_list(obj) or is_map(obj) do
     obj = try do
@@ -58,7 +73,7 @@ defmodule FormData do
   The built-in formatters are Multipart and URLEncoded, but a 3rd-party
   formatter that is a behaviour of FormData.Formatter can be passed in as well.
   """
-  @spec create!(obj :: keyword | map | struct, formatter :: atom, output_opts :: keyword(boolean)) :: {:ok, any} | {:error, String.t}
+  @spec create!(obj :: input_type, formatter :: module, output_opts :: keyword(boolean)) :: payload
   def create!(obj, formatter, output_opts \\ [])
   def create!(obj, formatter, output_opts) when is_list(obj) or is_map(obj) do
     obj = try do
