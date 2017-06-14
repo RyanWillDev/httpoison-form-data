@@ -26,7 +26,7 @@ defmodule FormData.Formatters.Multipart do
       { :multipart, [{ "", "one", { "form-data", [ {"name", "\\"key\\""} ] }, [] }] }
 
   """
-  @spec output(stream :: Stream.t, _opts :: any) :: __MODULE__.t
+  @spec output(stream :: Enum.t, _opts :: any) :: __MODULE__.t
   def output(stream, _opts) do
     list = stream
       |> Stream.map(fn

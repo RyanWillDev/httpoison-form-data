@@ -35,7 +35,7 @@ defmodule FormData.Formatters.URLEncoded do
       "?Name=Value&Name2=Value2"
 
   """
-  @spec output(stream :: Stream.t, opts :: options) :: __MODULE__.t
+  @spec output(stream :: Enum.t, opts :: options) :: __MODULE__.t
   def output([], [url: true]), do: ""
   def output([], [get: true]), do: [params: []]
   def output([], _opts), do: {:form, []}
