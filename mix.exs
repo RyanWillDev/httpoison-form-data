@@ -4,7 +4,7 @@ defmodule FormData.Mixfile do
   def project do
     [app: :httpoison_form_data,
      version: "0.1.2",
-     elixir: "~> 1.4",
+     elixir: "~> 1.5",
      build_embedded: Mix.env == :prod,
      start_permanent: Mix.env == :prod,
      package: package(),
@@ -44,9 +44,9 @@ defmodule FormData.Mixfile do
   #
   # Type "mix help deps" for more examples and options
   defp deps do
-    [{:httpoison, "~> 0.11.2", only: :test}, # In the event you aren't using HTTPoison
+    [{:httpoison, "~> 0.12.0", only: :test}, # In the event you aren't using HTTPoison
      {:ex_doc, ">= 0.0.0", only: :dev},
-     {:bypass, "~> 0.6", only: :test},
+     {:bypass, "~> 0.8", only: :test},
      {:dialyxir, "~> 0.5", only: :dev, runtime: false}]
   end
 end
