@@ -48,10 +48,34 @@ defmodule FormDataTest do
   end
   def assert_upload(_upload, _filename, _content_type), do: flunk("Structure was not an upload")
 
+  defmodule TestStruct do
+    defstruct name: "Default"
+  end
+
   test "create allows custom formatters" do
     {:ok, result} = FormData.create([valid: "valid"], FormDataTest.NameFormatter)
 
     assert result == ["valid"]
+  end
+
+  test "create from struct works", %{bypass: bypass, url: url} do
+    Bypass.expect bypass, fn conn ->
+      assert_request(
+        conn,
+        "/",
+        "POST",
+        %{
+          "name" => "MyName"
+        },
+        []
+      )
+    end
+
+    {:ok, multipart} =
+      %TestStruct{name: "MyName"}
+      |> FormData.create(:multipart)
+
+    HTTPoison.post(url, multipart, %{})
   end
 
   test "create with :multipart correctly formats nested data", %{bypass: bypass, url: url} do

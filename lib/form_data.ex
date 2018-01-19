@@ -112,9 +112,13 @@ defmodule FormData do
       {k, v}
     end)
   end
+  defp ensure_keyword(%_{}=map) when is_map(map) do
+    map
+    |> Map.from_struct
+    |> Map.to_list
+  end
   defp ensure_keyword(map) when is_map(map) do
     map
-    |> Map.delete(:__struct__)
     |> Map.to_list
   end
 
