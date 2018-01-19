@@ -22,7 +22,7 @@ end
 
 def deps do
   [{:httpoison_form_data, "~> 0.1"},
-   {:httpoison, "~> 0.11.2"}]
+   {:httpoison, "~> 1.0"}]
 end
 ```
 
