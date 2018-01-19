@@ -44,7 +44,7 @@ defmodule FormData.Mixfile do
   #
   # Type "mix help deps" for more examples and options
   defp deps do
-    [{:httpoison, "~> 0.12.0", only: :test}, # In the event you aren't using HTTPoison
+    [{:httpoison, "~> 1.0", only: :test}, # In the event you aren't using HTTPoison
      {:ex_doc, ">= 0.0.0", only: :dev},
      {:bypass, "~> 0.8", only: :test},
      {:dialyxir, "~> 0.5", only: :dev, runtime: false}]
