@@ -5,7 +5,7 @@ defmodule FormData do
   """
 
   @type input_type :: keyword | map | struct
-  @type payload :: FormData.Formatters.Multipart.t | FormData.Formatters.URLEncoded.t
+  @type payload :: FormData.Formatters.Multipart.t() | FormData.Formatters.URLEncoded.t()
 
   defmodule Error do
     @moduledoc """
@@ -15,13 +15,13 @@ defmodule FormData do
     defexception [:message]
 
     def exception(value) do
-      msg = "expected Struct, Map, or Keyword, got: #{inspect value}"
+      msg = "expected Struct, Map, or Keyword, got: #{inspect(value)}"
       %__MODULE__{message: msg}
     end
   end
 
   defmodule File do
-    @type t :: %__MODULE__{path: String.t}
+    @type t :: %__MODULE__{path: String.t()}
 
     defstruct path: ""
 
@@ -30,7 +30,7 @@ defmodule FormData do
 
     Addition based on suprafly's (https://github.com/suprafly) fork for northofsummer.
     """
-    @spec new(path :: String.t) :: File.t
+    @spec new(path :: String.t()) :: File.t()
     def new(path) do
       %__MODULE__{path: path}
     end
@@ -48,20 +48,25 @@ defmodule FormData do
   The built-in formatters are Multipart and URLEncoded, but a 3rd-party
   formatter that is a behaviour of FormData.Formatter can be passed in as well.
   """
-  @spec create(obj :: input_type, formatter :: module, output_opts :: keyword(boolean)) :: {:ok, payload} | {:error, String.t}
+  @spec create(obj :: input_type, formatter :: module, output_opts :: keyword(boolean)) ::
+          {:ok, payload} | {:error, String.t()}
   def create(obj, formatter, output_opts \\ [])
+
   def create(obj, formatter, output_opts) when is_list(obj) or is_map(obj) do
-    obj = try do
-      ensure_keyword(obj) # Error in here if not a keyword list
-    rescue
-      _ -> {:error, Error.exception(obj)}
-    end
+    obj =
+      try do
+        # Error in here if not a keyword list
+        ensure_keyword(obj)
+      rescue
+        _ -> {:error, Error.exception(obj)}
+      end
 
     case obj do
-      {:error, _}=error -> error
+      {:error, _} = error -> error
       _ -> {:ok, do_create(obj, formatter, output_opts)}
     end
   end
+
   def create(obj, _formatter, _output_opts) do
     {:error, Error.exception(obj)}
   end
@@ -73,17 +78,22 @@ defmodule FormData do
   The built-in formatters are Multipart and URLEncoded, but a 3rd-party
   formatter that is a behaviour of FormData.Formatter can be passed in as well.
   """
-  @spec create!(obj :: input_type, formatter :: module, output_opts :: keyword(boolean)) :: payload
+  @spec create!(obj :: input_type, formatter :: module, output_opts :: keyword(boolean)) ::
+          payload
   def create!(obj, formatter, output_opts \\ [])
+
   def create!(obj, formatter, output_opts) when is_list(obj) or is_map(obj) do
-    obj = try do
-      ensure_keyword(obj) # Error in here if not a keyword list
-    rescue
-      _ -> raise Error, obj
-    end
+    obj =
+      try do
+        # Error in here if not a keyword list
+        ensure_keyword(obj)
+      rescue
+        _ -> raise Error, obj
+      end
 
     do_create(obj, formatter, output_opts)
   end
+
   def create!(obj, _formatter, _output_opts) do
     raise Error, obj
   end
@@ -112,14 +122,16 @@ defmodule FormData do
       {k, v}
     end)
   end
-  defp ensure_keyword(%_{}=map) when is_map(map) do
+
+  defp ensure_keyword(%_{} = map) when is_map(map) do
     map
-    |> Map.from_struct
-    |> Map.to_list
+    |> Map.from_struct()
+    |> Map.to_list()
   end
+
   defp ensure_keyword(map) when is_map(map) do
     map
-    |> Map.to_list
+    |> Map.to_list()
   end
 
   # this is the entry point. We start the to_form recursion by initializing each
@@ -140,7 +152,7 @@ defmodule FormData do
   # this tree, return the formatted data in an array. The array is important
   # because it is flat_map'd out of the array. This function must come before
   # the declaration of the is_map because structs will return true for is_map.
-  defp to_form(%File{}=file, name) do
+  defp to_form(%File{} = file, name) do
     [{name, file}]
   end
 
@@ -161,14 +173,16 @@ defmodule FormData do
     |> to_form(name)
   end
 
-  # Lists are simply iterated across. We append `[]` to the name provided.
+  # Lists are simply iterated across. We append `[index]` to the name provided.
   #
   # input:          ["value1", "value2", "value3"], "outer_key",
-  # recursing call: [to_form("value1", "outer_key[]"),
-  #                  to_form("value2", "outer_key[]"),
-  #                  to_form("value3", "outer_key[]")]
+  # recursing call: [to_form("value1", "outer_key[index]"),
+  #                  to_form("value2", "outer_key[index]"),
+  #                  to_form("value3", "outer_key[index]")]
   defp to_form(obj, name) when is_list(obj) do
-    Stream.flat_map(obj, &to_form(&1, name <> "[]"))
+    obj
+    |> Enum.with_index()
+    |> Stream.flat_map(&to_form(elem(&1, 0), name <> "[#{elem(&1, 1)}]"))
   end
 
   # When we have a value that does not fit the above conditions, we assume
@@ -190,5 +204,4 @@ defmodule FormData do
   defp not_nil({nil, _}), do: false
   defp not_nil({_, nil}), do: false
   defp not_nil(_), do: true
-
 end
